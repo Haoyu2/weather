@@ -6,6 +6,7 @@ gateway -> search -> details
 5. current project doesn't have any exception handling
 
 
+
 * no fail tolerance if other services couldn't respond(retry / circuit breaker(hystrix))
 * add security service
 * add configuration service

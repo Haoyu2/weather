@@ -1,7 +1,9 @@
 package com.example.details.controller;
 
 import com.example.details.service.WeatherService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,27 +19,23 @@ public class WeatherController {
 
     private final WeatherService weatherService;
 
-    @Value("${server.port}")
-    private int randomServerPort;
 
     @Autowired
-    public WeatherController(WeatherService weatherService) {
+    public WeatherController(@Qualifier( "weatherServiceFeign") WeatherService weatherService) {
         this.weatherService = weatherService;
     }
 
+
+
     @GetMapping("/details")
     public ResponseEntity<?> queryWeatherByCity(@RequestParam(required = true) String city) {
+        return new ResponseEntity<>(weatherService.findWheatherByCity(city), HttpStatus.OK);
+    }
+
+    @GetMapping("/details/{city}")
+    public ResponseEntity<?> findCityIdByName(@PathVariable String  city) {
         return new ResponseEntity<>(weatherService.findCityIdByName(city), HttpStatus.OK);
     }
 
 
-    @GetMapping("/details/{id}")
-    public ResponseEntity<?> queryWeatherByCity(@PathVariable int id) {
-        return new ResponseEntity<Map>(weatherService.findCityNameById(id), HttpStatus.OK);
-    }
-
-    @GetMapping("/details/port")
-    public ResponseEntity<?> queryWeatherByCity() {
-        return new ResponseEntity<>("weather service + " + randomServerPort, HttpStatus.OK);
-    }
 }

@@ -18,10 +18,22 @@
             <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.6.4</version>
+        </dependency>
+
+
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-apache-client4</artifactId>
             <version>1.19.1</version>
         </dependency>
+
+
+
+
     </dependencies>
 </project>

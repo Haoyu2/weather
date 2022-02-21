@@ -1,9 +1,9 @@
 package com.example.details.service;
 
 
-
 import com.example.details.config.EndpointConfig;
 import com.example.details.pojo.City;
+import com.example.details.pojo.CityWeather;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -12,9 +12,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
-public class WeatherServiceImpl implements WeatherService{
+public class WeatherServiceImpl implements WeatherService {
 
     private final RestTemplate restTemplate;
 
@@ -28,8 +30,8 @@ public class WeatherServiceImpl implements WeatherService{
     public List<Integer> findCityIdByName(String city) {
         City[] cities = restTemplate.getForObject(EndpointConfig.queryWeatherByCity + city, City[].class);
         List<Integer> ans = new ArrayList<>();
-        for(City c: cities) {
-            if(c != null && c.getWoeid() != null) {
+        for (City c : cities) {
+            if (c != null && c.getWoeid() != null) {
                 ans.add(c.getWoeid());
             }
         }
@@ -39,7 +41,23 @@ public class WeatherServiceImpl implements WeatherService{
     @Override
     //change findcitynamebyid => find weather details by id
     public Map<String, Map> findCityNameById(int id) {
+        System.out.println(id);
         Map<String, Map> ans = restTemplate.getForObject(EndpointConfig.queryWeatherById + id, HashMap.class);
         return ans;
+    }
+
+    public CompletableFuture<CityWeather> findWeatherById(int id) {
+
+        return CompletableFuture.
+                supplyAsync(() ->
+                        restTemplate.getForObject(EndpointConfig.queryWeatherById + id, CityWeather.class));
+    }
+
+    @Override
+    public List<CityWeather> findWheatherByCity(String city) {
+        return findCityIdByName(city).parallelStream()
+                .map(this::findWeatherById)
+                .map(f -> f.join())
+                .collect(Collectors.toList());
     }
 }
